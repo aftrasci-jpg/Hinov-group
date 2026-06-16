@@ -1,7 +1,14 @@
 import React from 'react';
 import { Target, Eye, ShieldCheck, Heart, Award, ArrowUpRight, Zap, RefreshCw, Send, CheckCircle, Quote, Users } from 'lucide-react';
+import { DEFAULT_SITE_CONTENT } from '../supabase';
+import { SiteContent } from '../types';
 
-export default function Apropos() {
+interface AproposProps {
+  siteContent: SiteContent;
+}
+
+export default function Apropos({ siteContent }: AproposProps) {
+  const about = siteContent?.about ?? DEFAULT_SITE_CONTENT.about;
   const VALUES = [
     { name: "Innovation", icon: Zap, color: "#4A93D1", desc: "Intégrer les dernières technologies informatiques pour propulser votre entreprise." },
     { name: "Excellence", icon: Award, color: "#F29A1A", desc: "Assurer un niveau de rendu professionnel et sans compromis sur chacun de nos livrables." },
@@ -69,7 +76,7 @@ export default function Apropos() {
               HINOV Group, votre partenaire de confiance multiservices.
             </h2>
             <p className="text-sm text-gray-500 leading-relaxed font-light">
-              HINOV Group accompagne les entreprises, administrations, établissements scolaires et particuliers dans leur transformation digitale et leurs besoins en communication visuelle. 
+              {about.intro}
             </p>
             <p className="text-sm text-gray-500 leading-relaxed font-light">
               Notre expertise s’articule autour de quatre pôles majeurs : 
@@ -77,7 +84,7 @@ export default function Apropos() {
             </p>
             <div className="pt-2">
               <span className="text-[#F29A1A] font-extrabold text-sm font-mono tracking-wide">
-                « Innovons ensemble, un clic à la fois »
+                {about.tagline}
               </span>
             </div>
           </div>
@@ -95,7 +102,7 @@ export default function Apropos() {
                   <div>
                     <h3 className="font-extrabold text-slate-900 text-base">Notre Mission</h3>
                     <p className="text-xs text-gray-500 mt-1 font-light leading-relaxed">
-                      Fournir des solutions technologiques innovantes, solides, performantes, et hautement accessibles pour garantir la croissance d'affaires de nos clients.
+                      {about.mission}
                     </p>
                   </div>
                 </div>
@@ -107,7 +114,7 @@ export default function Apropos() {
                   <div>
                     <h3 className="font-extrabold text-slate-900 text-base">Notre Vision</h3>
                     <p className="text-xs text-gray-500 mt-1 font-light leading-relaxed">
-                      Devenir la référence incontournable en Côte d'Ivoire dans les domaines interconnectés de l'informatique, de la communication digitale et de l'imprimerie.
+                      {about.vision}
                     </p>
                   </div>
                 </div>
