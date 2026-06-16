@@ -420,7 +420,7 @@ export default function App() {
         )}
 
         {/* TAB 4: RÉALISATIONS GALLERY */}
-        {resolvedTab === 'realisations' && <Gallery />}
+        {resolvedTab === 'realisations' && <Gallery setCurrentTab={setCurrentTab} />}
 
         {/* TAB 5: BLOG MAG */}
         {resolvedTab === 'blog' && <Blog />}

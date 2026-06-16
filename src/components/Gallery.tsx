@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, Image as ImageIcon, Eye, X, Filter } from 'lucide-react';
-import { RealisationItem } from '../types';
-import { getRealisations } from '../supabase';
+import { RealisationItem, Product } from '../types';
+import { getRealisations, getProducts } from '../supabase';
+import FeaturedSlider from './FeaturedSlider';
 
 const CATEGORIES = [
   "Tous",
@@ -12,8 +13,13 @@ const CATEGORIES = [
   "Textile Personnalisé"
 ];
 
-export default function Gallery() {
+interface GalleryProps {
+  setCurrentTab: (tab: string) => void;
+}
+
+export default function Gallery({ setCurrentTab }: GalleryProps) {
   const [items, setItems] = useState<RealisationItem[]>([]);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [selectedFilter, setSelectedFilter] = useState("Tous");
   const [zoomItem, setZoomItem] = useState<RealisationItem | null>(null);
 
@@ -22,8 +28,14 @@ export default function Gallery() {
     setItems(list);
   };
 
+  const loadFeatured = async () => {
+    const all = await getProducts();
+    setFeaturedProducts(all.filter(p => p.isPopular));
+  };
+
   useEffect(() => {
     loadRealisations();
+    loadFeatured();
   }, []);
 
   const filteredItems = items.filter(item => 
@@ -34,6 +46,14 @@ export default function Gallery() {
     <div id="hinov-realisations-gallery" className="bg-white min-h-screen py-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
+        {/* Featured Products Slider */}
+        {featuredProducts.length > 0 && (
+          <FeaturedSlider
+            products={featuredProducts}
+            onRequestDevis={(product) => setCurrentTab(`catalogue-${product.category}`)}
+          />
+        )}
+
         {/* Gallery Intro header */}
         <div className="text-center max-w-3xl mx-auto mb-12 space-y-4">
           <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-[#111111]/5 text-slate-800 text-xs font-semibold">

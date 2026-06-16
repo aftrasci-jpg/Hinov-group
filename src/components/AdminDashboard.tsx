@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Settings, LayoutDashboard, Briefcase, Image as ImageIcon, FileText, 
   ShoppingBag, ShieldAlert, LogOut, Plus, Trash2, Edit3, 
-  CheckCircle, FileDown, TrendingUp, Users, ShoppingCart, RefreshCw, X, Sparkles, Send, Database, ClipboardList 
+  CheckCircle, FileDown, TrendingUp, Users, ShoppingCart, RefreshCw, X, Sparkles, Send, Database, ClipboardList, Star
 } from 'lucide-react';
 import { Product, RealisationItem, BlogArticle, DevisRequest, SiteStats } from '../types';
 import { 
@@ -680,6 +680,17 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
                               )}
                             </td>
                             <td className="px-6 py-4 text-center space-x-2">
+                              <button
+                                onClick={async () => {
+                                  await updateProduct(p.id, { isPopular: !p.isPopular });
+                                  setProducts(prev => prev.map(x => x.id === p.id ? { ...x, isPopular: !x.isPopular } : x));
+                                  onNotify(p.isPopular ? `"${p.name}" retiré des vedettes.` : `"${p.name}" ajouté aux produits vedettes !`);
+                                }}
+                                title={p.isPopular ? 'Retirer des vedettes' : 'Marquer comme vedette'}
+                                className={`p-1 px-1.5 rounded cursor-pointer transition-colors ${p.isPopular ? 'text-amber-500 bg-amber-100/50 hover:bg-amber-100' : 'text-gray-400 bg-gray-100/50 hover:bg-amber-100/50 hover:text-amber-500'}`}
+                              >
+                                <Star className={`w-4 h-4 ${p.isPopular ? 'fill-amber-500' : ''}`} />
+                              </button>
                               <button 
                                 onClick={() => openEditProduct(p)}
                                 className="p-1 px-1.5 text-blue-600 bg-blue-100/30 hover:bg-blue-100 rounded cursor-pointer"

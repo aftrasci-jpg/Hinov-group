@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, MessageSquare, Tag, ArrowRight, Sparkles, Send, X, Check } from 'lucide-react';
 import { Product } from '../types';
 import { getProducts, addDevisRequest, trackProductClick } from '../supabase';
+import FeaturedSlider from './FeaturedSlider';
 
 interface CatalogueProps {
   initialCategoryFilter?: string | null;
@@ -131,6 +132,18 @@ export default function Catalogue({ initialCategoryFilter, onSuccessMessage }: C
             </p>
           </div>
         </div>
+
+        {/* Featured Products Slider */}
+        {(() => {
+          const featured = products.filter(p => p.isPopular);
+          if (featured.length === 0) return null;
+          return (
+            <FeaturedSlider
+              products={featured}
+              onRequestDevis={(product) => { trackProductClick(product.name, product.category); setIsRequesting(product); }}
+            />
+          );
+        })()}
 
         {/* Searching & filters row */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm flex flex-col lg:flex-row gap-4 items-center justify-between mb-8">
