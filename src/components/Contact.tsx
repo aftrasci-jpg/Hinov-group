@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Send, Phone, Mail, MapPin, Clock, Calendar, Compass, HelpCircle, Check, Star } from 'lucide-react';
-import { addDevisRequest } from '../supabase';
+import { addDevisRequest, DEFAULT_SITE_CONTENT } from '../supabase';
+import { SiteContent } from '../types';
 
 interface ContactProps {
   onSuccessMessage: (msg: string) => void;
+  siteContent: SiteContent;
 }
 
-export default function Contact({ onSuccessMessage }: ContactProps) {
+export default function Contact({ onSuccessMessage, siteContent }: ContactProps) {
+  const contact = siteContent?.contact ?? DEFAULT_SITE_CONTENT.contact;
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -84,7 +87,7 @@ export default function Contact({ onSuccessMessage }: ContactProps) {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Visiter nos bureaux</span>
-                    <strong className="text-slate-100 text-sm font-bold">Abidjan Yopougon cité CIE rue S 259</strong>
+                    <strong className="text-slate-100 text-sm font-bold">{contact.address}</strong>
                     <p className="text-xs text-gray-400 mt-0.5">Côte d'Ivoire</p>
                   </div>
                 </div>
@@ -96,11 +99,11 @@ export default function Contact({ onSuccessMessage }: ContactProps) {
                   <div>
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Téléphones commerciaux</span>
                     <div className="flex flex-col space-y-1">
-                      <a href="tel:+2252723227992" className="text-slate-100 text-sm font-semibold hover:text-[#4A93D1] transition-colors">
-                        +(225) 27 23 227 992
+                      <a href={`tel:+${contact.phone1.replace(/\D/g, '')}`} className="text-slate-100 text-sm font-semibold hover:text-[#4A93D1] transition-colors">
+                        {contact.phone1}
                       </a>
-                      <a href="tel:+2250759813511" className="text-slate-100 text-sm font-semibold hover:text-[#4A93D1] transition-colors">
-                        +(225) 07 59 81 35 11
+                      <a href={`tel:+${contact.phone2.replace(/\D/g, '')}`} className="text-slate-100 text-sm font-semibold hover:text-[#4A93D1] transition-colors">
+                        {contact.phone2}
                       </a>
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5">Soutien WhatsApp direct disponible sur la ligne mobile</p>
@@ -113,8 +116,8 @@ export default function Contact({ onSuccessMessage }: ContactProps) {
                   </div>
                   <div>
                     <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest block mb-0.5">Email professionnel</span>
-                    <a href="mailto:hinovgroup@hinovgroup.com" className="text-slate-100 text-sm font-semibold hover:text-[#4A93D1] transition-colors">
-                      hinovgroup@hinovgroup.com
+                    <a href={`mailto:${contact.email}`} className="text-slate-100 text-sm font-semibold hover:text-[#4A93D1] transition-colors">
+                      {contact.email}
                     </a>
                   </div>
                 </div>
