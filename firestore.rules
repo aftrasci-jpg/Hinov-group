@@ -1,0 +1,119 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // -------------------------------------------------------------
+    // PILLAR 1: GLOBAL SAFETY NET CATCH-ALL DEFAULT DENY
+    // -------------------------------------------------------------
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // -------------------------------------------------------------
+    // PILLAR 3: REUSABLE GLOBAL SECURITY PRIMITIVES
+    // -------------------------------------------------------------
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isEmailVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    // Role-Based Access: Checks if user's UID exists in the trusted administrators roster
+    function isAdmin() {
+      return isSignedIn() && (
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid)) ||
+        request.auth.token.email == "admin@hinov.com"
+      );
+    }
+
+    // Document ID validation to prevent resource exhaustion/Denial of Wallet attacks
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // -------------------------------------------------------------
+    // ENTITY MATCH BLOCKS
+    // -------------------------------------------------------------
+
+    // 1. PRODUCTS COLLECTION
+    match /products/{productId} {
+      function isValidProduct(data) {
+        return data.keys().hasAll(['id', 'name', 'category', 'description', 'imageUrl']) &&
+               data.keys().size() <= 7 &&
+               data.id is string && data.id.size() <= 128 &&
+               data.name is string && data.name.size() <= 200 &&
+               data.category is string && data.category.size() <= 100 &&
+               data.description is string && data.description.size() <= 2000 &&
+               data.imageUrl is string && data.imageUrl.size() <= 1000;
+      }
+
+      allow read: if true; // Public catalogue access
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() && isValidProduct(request.resource.data);
+    }
+
+    // 2. REALISATIONS PORTFOLIO COLLECTION
+    match /realisations/{realisationId} {
+      function isValidRealisation(data) {
+        return data.keys().hasAll(['id', 'title', 'category', 'imageUrl']) &&
+               data.keys().size() == 4 &&
+               data.id is string && data.id.size() <= 128 &&
+               data.title is string && data.title.size() <= 200 &&
+               data.category is string && data.category.size() <= 100 &&
+               data.imageUrl is string && data.imageUrl.size() <= 1000;
+      }
+
+      allow read: if true; // Public portfolio access
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() && isValidRealisation(request.resource.data);
+    }
+
+    // 3. BLOG MAGAZINE ARTICLES SYSTEM
+    match /blog/{articleId} {
+      function isValidArticle(data) {
+        return data.keys().hasAll(['id', 'title', 'category', 'excerpt', 'content', 'date', 'imageUrl', 'author']) &&
+               data.keys().size() == 8 &&
+               data.id is string && data.id.size() <= 128 &&
+               data.title is string && data.title.size() <= 200 &&
+               data.category is string && data.category.size() <= 100 &&
+               data.excerpt is string && data.excerpt.size() <= 500 &&
+               data.content is string && data.content.size() <= 20000 &&
+               data.date is string && data.date.size() <= 20 &&
+               data.imageUrl is string && data.imageUrl.size() <= 1000 &&
+               data.author is string && data.author.size() <= 100;
+      }
+
+      allow read: if true; // Reading posts is allowed publicly
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() && isValidArticle(request.resource.data);
+    }
+
+    // 4. DEVIS_REQUESTS CUSTOMER INQUIRIES
+    match /devis_requests/{requestId} {
+      function isValidRequest(data) {
+        return data.keys().hasAll(['id', 'name', 'phone', 'email', 'subject', 'message', 'createdAt', 'status']) &&
+               data.id is string && data.id.size() <= 128 &&
+               data.name is string && data.name.size() <= 200 &&
+               data.phone is string && data.phone.size() <= 40 &&
+               data.email is string && data.email.size() <= 100 &&
+               data.subject is string && data.subject.size() <= 200 &&
+               data.message is string && data.message.size() <= 4000 &&
+               data.createdAt is string && data.createdAt.size() <= 40 &&
+               data.status in ['En attente', 'Traité', 'Accepté', 'Refusé'];
+      }
+
+      allow create: if isValidRequest(request.resource.data); // Anyone can post a Quote inquiry!
+      allow read, delete: if isAdmin();
+      allow update: if isAdmin() && isValidRequest(request.resource.data);
+    }
+
+    // 5. GLOBAL SITESTATS READOUTS
+    match /stats/{statsId} {
+      allow read: if true;
+      allow write: if isAdmin() || true; // Public increments for click-counts
+    }
+
+  }
+}

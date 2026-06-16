@@ -1,0 +1,100 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "Product item available in the HINOV digital catalogue",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "price": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "isPopular": { "type": "boolean" }
+      },
+      "required": ["id", "name", "category", "description", "imageUrl"]
+    },
+    "RealisationItem": {
+      "title": "RealisationItem",
+      "description": "Finished work or project sample displayed in the company portfolio gallery",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "imageUrl": { "type": "string" }
+      },
+      "required": ["id", "title", "category", "imageUrl"]
+    },
+    "BlogArticle": {
+      "title": "BlogArticle",
+      "description": "Blog posting or news article with insights about IT, printing, digital, or branding",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "category": { "type": "string" },
+        "excerpt": { "type": "string" },
+        "content": { "type": "string" },
+        "date": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "author": { "type": "string" }
+      },
+      "required": ["id", "title", "category", "excerpt", "content", "date", "imageUrl", "author"]
+    },
+    "DevisRequest": {
+      "title": "DevisRequest",
+      "description": "Customer inquiry requesting quotes for a product or custom digital/printing service",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "email": { "type": "string" },
+        "subject": { "type": "string" },
+        "message": { "type": "string" },
+        "productName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "status": { "type": "string", "enum": ["En attente", "Accepté", "Refusé", "Traité"] }
+      },
+      "required": ["id", "name", "phone", "email", "subject", "message", "createdAt", "status"]
+    },
+    "SiteStats": {
+      "title": "SiteStats",
+      "description": "Dynamic web stats including visitor estimatives, request totals and popular items",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "visitorsCount": { "type": "number" },
+        "requestsCount": { "type": "number" },
+        "popularProducts": {
+          "type": "array"
+        }
+      },
+      "required": ["id", "visitorsCount", "requestsCount"]
+    }
+  },
+  "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Collection of catalogue products"
+    },
+    "/realisations/{realisationId}": {
+      "schema": "RealisationItem",
+      "description": "Collection of portfolio projects done by HINOV Group"
+    },
+    "/blog/{articleId}": {
+      "schema": "BlogArticle",
+      "description": "Collection of news or expert articles published on the blog"
+    },
+    "/devis_requests/{requestId}": {
+      "schema": "DevisRequest",
+      "description": "User quotes and feedback inquiries"
+    },
+    "/stats/{statsId}": {
+      "schema": "SiteStats",
+      "description": "General system metrics and counting analytics"
+    }
+  }
+}

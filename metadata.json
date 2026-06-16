@@ -1,0 +1,8 @@
+{
+  "name": "HINOV Group",
+  "description": "Site officiel de HINOV Group - Expert en solutions informatiques, communication digitale, imprimerie professionnelle, fournitures scolaires et de bureau, et branding d’objets publicitaires.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
