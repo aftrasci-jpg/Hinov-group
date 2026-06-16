@@ -4,14 +4,14 @@ import {
   ShoppingBag, ShieldAlert, LogOut, Plus, Trash2, Edit3, 
   CheckCircle, FileDown, TrendingUp, Users, ShoppingCart, RefreshCw, X, Sparkles, Send, Database, ClipboardList, Star
 } from 'lucide-react';
-import { Product, RealisationItem, BlogArticle, DevisRequest, SiteStats } from '../types';
+import { Product, RealisationItem, BlogArticle, DevisRequest, SiteStats, SiteContent } from '../types';
 import { 
   getSessionUser, signUpOrInMock, logoutSessionUser,
   getProducts, addProduct, updateProduct, deleteProduct,
   getRealisations, addRealisation, deleteRealisation, updateRealisation,
   getBlogArticles, addBlogArticle, updateBlogArticle, deleteBlogArticle,
   getDevisRequests, updateDevisRequestStatus, deleteDevisRequest,
-  getStats
+  getStats, getSiteContent, updateSiteContent, DEFAULT_SITE_CONTENT
 } from '../supabase';
 import { getStorageConfig, uploadToStorage } from '../utils/supabase-storage';
 import { motion } from 'motion/react';
@@ -19,12 +19,16 @@ import { motion } from 'motion/react';
 interface AdminDashboardProps {
   onNotify: (msg: string) => void;
   setCurrentTab: (tab: string) => void;
+  siteContent: SiteContent;
+  onSiteContentChange: (c: SiteContent) => void;
 }
 
-export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboardProps) {
+export default function AdminDashboard({ onNotify, setCurrentTab, siteContent, onSiteContentChange }: AdminDashboardProps) {
   const [user, setUser] = useState<any>(null);
   const [username, setUsername] = useState('admin@hinov.com');
-  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'catalogue' | 'galerie' | 'blog' | 'demandes'>('dashboard');
+  const [activeSubTab, setActiveSubTab] = useState<'dashboard' | 'catalogue' | 'galerie' | 'blog' | 'demandes' | 'textes'>('dashboard');
+  const [contentForm, setContentForm] = useState<SiteContent>(siteContent ?? DEFAULT_SITE_CONTENT);
+  const [isSavingContent, setIsSavingContent] = useState(false);
 
   // Core Db state
   const [products, setProducts] = useState<Product[]>([]);
@@ -316,6 +320,28 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
     }
   };
 
+  // SITE CONTENT operations
+  const handleContentSave = async () => {
+    setIsSavingContent(true);
+    try {
+      await updateSiteContent(contentForm);
+      onSiteContentChange(contentForm);
+      onNotify("✓ Textes du site mis à jour et publiés avec succès !");
+    } catch (err) {
+      onNotify("Erreur lors de la sauvegarde des textes.");
+    } finally {
+      setIsSavingContent(false);
+    }
+  };
+
+  const updateSlide = (index: number, field: 'title' | 'description' | 'ctaText', value: string) => {
+    setContentForm(prev => {
+      const slides = [...prev.hero.slides];
+      slides[index] = { ...slides[index], [field]: value };
+      return { ...prev, hero: { slides } };
+    });
+  };
+
   // Devis Operations
   const handleStatusChange = async (id: string, status: DevisRequest['status']) => {
     await updateDevisRequestStatus(id, status);
@@ -486,7 +512,8 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
               { id: 'catalogue', label: 'Gestion Catalogue', icon: ShoppingBag },
               { id: 'galerie', label: 'Gestion Galerie', icon: ImageIcon },
               { id: 'blog', label: 'Gestion Blog', icon: FileText },
-              { id: 'demandes', label: 'Demandes de Devis Client', icon: ClipboardList }
+              { id: 'demandes', label: 'Demandes de Devis Client', icon: ClipboardList },
+              { id: 'textes', label: 'Textes du Site', icon: Edit3 }
             ].map((tab) => {
               const IconComp = tab.icon;
               const isActive = activeSubTab === tab.id;
@@ -888,6 +915,158 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* 6. TEXTES DU SITE */}
+            {activeSubTab === 'textes' && (
+              <div className="space-y-6">
+
+                {/* Header */}
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900">Éditeur de textes du site</h3>
+                    <p className="text-xs text-gray-400 mt-1">Modifiez les textes visibles sur le site public et publiez-les instantanément.</p>
+                  </div>
+                  <button
+                    onClick={handleContentSave}
+                    disabled={isSavingContent}
+                    className="cursor-pointer bg-[#4A93D1] hover:bg-[#4A93D1]/90 disabled:opacity-60 text-white font-bold text-xs px-6 py-3 rounded-xl transition-all flex items-center space-x-2 shrink-0"
+                  >
+                    {isSavingContent ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    <span>{isSavingContent ? 'Publication...' : 'Publier les modifications'}</span>
+                  </button>
+                </div>
+
+                {/* Section 1: Hero Slider */}
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-5">
+                  <div className="flex items-center space-x-2.5 pb-3 border-b">
+                    <div className="w-8 h-8 rounded-lg bg-[#4A93D1]/10 flex items-center justify-center">
+                      <Sparkles className="w-4 h-4 text-[#4A93D1]" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-extrabold text-slate-900">Slider Hero (page d'accueil)</h4>
+                      <p className="text-[10px] text-gray-400">4 diapositives — titre, description, et bouton CTA</p>
+                    </div>
+                  </div>
+
+                  {contentForm.hero.slides.map((slide, i) => {
+                    const colors = ['#4A93D1', '#C83AB3', '#F29A1A', '#4CD37E'];
+                    const labels = ['Slide 1 — Informatique', 'Slide 2 — Digital', 'Slide 3 — Imprimerie', 'Slide 4 — Textile'];
+                    return (
+                      <div key={i} className="border border-gray-100 rounded-xl p-4 space-y-3">
+                        <div className="flex items-center space-x-2 mb-1">
+                          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: colors[i] }} />
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{labels[i]}</span>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide block">Titre</label>
+                          <input
+                            type="text"
+                            value={slide.title}
+                            onChange={e => updateSlide(i, 'title', e.target.value)}
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#4A93D1] font-semibold"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide block">Description</label>
+                          <textarea
+                            value={slide.description}
+                            onChange={e => updateSlide(i, 'description', e.target.value)}
+                            rows={2}
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#4A93D1] resize-none font-light"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide block">Texte du bouton CTA</label>
+                          <input
+                            type="text"
+                            value={slide.ctaText}
+                            onChange={e => updateSlide(i, 'ctaText', e.target.value)}
+                            className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#4A93D1]"
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Section 2: Coordonnées Contact */}
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+                  <div className="flex items-center space-x-2.5 pb-3 border-b">
+                    <div className="w-8 h-8 rounded-lg bg-[#4CD37E]/10 flex items-center justify-center">
+                      <Send className="w-4 h-4 text-[#4CD37E]" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-extrabold text-slate-900">Coordonnées de contact</h4>
+                      <p className="text-[10px] text-gray-400">Affichées sur la page Contact</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {[
+                      { label: 'Adresse', key: 'address', placeholder: 'Abidjan Yopougon cité CIE rue S 259' },
+                      { label: 'Téléphone 1', key: 'phone1', placeholder: '+(225) 27 23 227 992' },
+                      { label: 'Téléphone 2', key: 'phone2', placeholder: '+(225) 07 59 81 35 11' },
+                      { label: 'Email', key: 'email', placeholder: 'hinovgroup@hinovgroup.com' },
+                      { label: 'Numéro WhatsApp (chiffres seulement)', key: 'whatsapp', placeholder: '2250759813511' }
+                    ].map(({ label, key, placeholder }) => (
+                      <div key={key} className={key === 'address' || key === 'whatsapp' ? 'sm:col-span-2' : ''}>
+                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide block mb-1">{label}</label>
+                        <input
+                          type="text"
+                          value={(contentForm.contact as any)[key]}
+                          onChange={e => setContentForm(prev => ({ ...prev, contact: { ...prev.contact, [key]: e.target.value } }))}
+                          placeholder={placeholder}
+                          className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#4A93D1]"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Section 3: À propos */}
+                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+                  <div className="flex items-center space-x-2.5 pb-3 border-b">
+                    <div className="w-8 h-8 rounded-lg bg-[#F29A1A]/10 flex items-center justify-center">
+                      <Star className="w-4 h-4 text-[#F29A1A]" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-extrabold text-slate-900">À propos</h4>
+                      <p className="text-[10px] text-gray-400">Slogan, introduction, mission et vision</p>
+                    </div>
+                  </div>
+
+                  {[
+                    { label: 'Slogan (tagline)', key: 'tagline', rows: 1 },
+                    { label: "Paragraphe d'introduction", key: 'intro', rows: 3 },
+                    { label: 'Notre Mission', key: 'mission', rows: 2 },
+                    { label: 'Notre Vision', key: 'vision', rows: 2 }
+                  ].map(({ label, key, rows }) => (
+                    <div key={key} className="space-y-1">
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wide block">{label}</label>
+                      <textarea
+                        value={(contentForm.about as any)[key]}
+                        onChange={e => setContentForm(prev => ({ ...prev, about: { ...prev.about, [key]: e.target.value } }))}
+                        rows={rows}
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-[#4A93D1] resize-none font-light leading-relaxed"
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Save footer */}
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleContentSave}
+                    disabled={isSavingContent}
+                    className="cursor-pointer bg-slate-900 hover:bg-slate-800 disabled:opacity-60 text-white font-bold text-xs px-8 py-3 rounded-xl transition-all flex items-center space-x-2"
+                  >
+                    {isSavingContent ? <RefreshCw className="w-4 h-4 animate-spin" /> : <CheckCircle className="w-4 h-4" />}
+                    <span>{isSavingContent ? 'Publication en cours...' : 'Publier toutes les modifications'}</span>
+                  </button>
+                </div>
+
               </div>
             )}
 
