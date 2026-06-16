@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import { Product, RealisationItem, BlogArticle, DevisRequest, SiteStats } from './types';
+import { Product, RealisationItem, BlogArticle, DevisRequest, SiteStats, SiteContent } from './types';
 
 let supabase: SupabaseClient | null = null;
 let isRealSupabase = false;
@@ -716,6 +716,65 @@ export const trackProductClick = (productName: string, category: string): void =
 export const incrementVisitorMetric = (): void => {
   memoryStats.visitorsCount += 1;
   saveLocalStorageData('stats', memoryStats);
+};
+
+// -------------------------------------------------------------
+// SITE CONTENT (textes éditables du site)
+// -------------------------------------------------------------
+
+export const DEFAULT_SITE_CONTENT: SiteContent = {
+  hero: {
+    slides: [
+      { title: "Solutions Informatiques Professionnelles", description: "Maintenance, déploiements de réseaux stables, vidéosurveillance IP de pointe et équipements performants.", ctaText: "Demander un devis" },
+      { title: "Développez votre présence digitale", description: "Développement de sites web vitrines et marchands, conception d'applications web d'entreprise et marketing d'influence.", ctaText: "Voir nos services" },
+      { title: "Votre partenaire en imprimerie & fournitures", description: "Impression numérique et offset haut de gamme, fournitures scolaires pour établissements et fournitures pour votre bureautique.", ctaText: "Voir le catalogue" },
+      { title: "Donnez une visibilité forte à votre marque", description: "Marquage textile haut de gamme, sérigraphie sur goodies et objets publicitaires, et marquage publicitaire de votre flotte automobile.", ctaText: "Obtenir un devis" }
+    ]
+  },
+  contact: {
+    address: "Abidjan Yopougon cité CIE rue S 259",
+    phone1: "+(225) 27 23 227 992",
+    phone2: "+(225) 07 59 81 35 11",
+    email: "hinovgroup@hinovgroup.com",
+    whatsapp: "2250759813511"
+  },
+  about: {
+    tagline: "« Innovons ensemble, un clic à la fois »",
+    intro: "HINOV Group accompagne les entreprises, administrations, établissements scolaires et particuliers dans leur transformation digitale et leurs besoins en communication visuelle.",
+    mission: "Fournir des solutions technologiques innovantes, solides, performantes, et hautement accessibles pour garantir la croissance d'affaires de nos clients.",
+    vision: "Devenir la référence incontournable en Côte d'Ivoire dans les domaines interconnectés de l'informatique, de la communication digitale et de l'imprimerie."
+  }
+};
+
+const CONTENT_LS_KEY = 'hinov_site_content';
+
+export const getSiteContent = async (): Promise<SiteContent> => {
+  if (isRealSupabase && supabase) {
+    try {
+      const { data, error } = await supabase
+        .from('site_content')
+        .select('content')
+        .eq('id', 'main')
+        .single();
+      if (!error && data?.content) return data.content as SiteContent;
+    } catch (_) {}
+  }
+  try {
+    const raw = localStorage.getItem(CONTENT_LS_KEY);
+    if (raw) return JSON.parse(raw) as SiteContent;
+  } catch (_) {}
+  return DEFAULT_SITE_CONTENT;
+};
+
+export const updateSiteContent = async (content: SiteContent): Promise<void> => {
+  if (isRealSupabase && supabase) {
+    try {
+      await supabase.from('site_content').upsert({ id: 'main', content });
+    } catch (_) {}
+  }
+  try {
+    localStorage.setItem(CONTENT_LS_KEY, JSON.stringify(content));
+  } catch (_) {}
 };
 
 export { supabase };
