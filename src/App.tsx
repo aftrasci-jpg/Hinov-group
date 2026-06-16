@@ -10,8 +10,8 @@ import Apropos from './components/Apropos';
 import AdminDashboard from './components/AdminDashboard';
 
 // DB getters & types
-import { Product, RealisationItem } from './types';
-import { getProducts, getRealisations, trackProductClick } from './supabase';
+import { Product, RealisationItem, SiteContent } from './types';
+import { getProducts, getRealisations, trackProductClick, getSiteContent, DEFAULT_SITE_CONTENT } from './supabase';
 
 import { 
   Network, Printer, Shirt, BookOpen, ChevronRight, 
@@ -24,6 +24,12 @@ export default function App() {
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [recentRealisations, setRecentRealisations] = useState<RealisationItem[]>([]);
   const [notification, setNotification] = useState<string | null>(null);
+  const [siteContent, setSiteContent] = useState<SiteContent>(DEFAULT_SITE_CONTENT);
+
+  // Load site content (textes éditables)
+  useEffect(() => {
+    getSiteContent().then(setSiteContent).catch(() => {});
+  }, []);
 
   // Load lobby specific elements
   useEffect(() => {
@@ -83,7 +89,7 @@ export default function App() {
         {resolvedTab === 'accueil' && (
           <div className="space-y-16 pb-12 animate-fade-in">
             {/* Sliding covers hero banner */}
-            <HeroSlider setCurrentTab={setCurrentTab} />
+            <HeroSlider setCurrentTab={setCurrentTab} siteContent={siteContent} />
 
             {/* Core Pillars business showcase */}
             <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 space-y-10">
@@ -409,7 +415,7 @@ export default function App() {
         )}
 
         {/* TAB 2: À PROPOS */}
-        {resolvedTab === 'apropos' && <Apropos />}
+        {resolvedTab === 'apropos' && <Apropos siteContent={siteContent} />}
 
         {/* TAB 3: CATALOGUE (with initial filter) */}
         {resolvedTab === 'catalogue' && (
@@ -426,13 +432,15 @@ export default function App() {
         {resolvedTab === 'blog' && <Blog />}
 
         {/* TAB 6: CONTACT & QUOTES */}
-        {resolvedTab === 'contact' && <Contact onSuccessMessage={triggerNotification} />}
+        {resolvedTab === 'contact' && <Contact onSuccessMessage={triggerNotification} siteContent={siteContent} />}
 
         {/* TAB 7: ADMINISTRATIVE DASHBOARD CONSOLE */}
         {resolvedTab === 'admin' && (
           <AdminDashboard 
             onNotify={triggerNotification} 
             setCurrentTab={setCurrentTab}
+            siteContent={siteContent}
+            onSiteContentChange={setSiteContent}
           />
         )}
 
