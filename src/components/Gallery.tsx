@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Layers, Image as ImageIcon, Eye, X, Filter } from 'lucide-react';
 import { RealisationItem } from '../types';
-import { getRealisations } from '../firebase';
+import { getRealisations } from '../supabase';
 
 const CATEGORIES = [
   "Tous",

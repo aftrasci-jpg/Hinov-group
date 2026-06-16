@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, ShoppingCart, MessageSquare, Tag, ArrowRight, Sparkles, Send, X, Check } from 'lucide-react';
 import { Product } from '../types';
-import { getProducts, addDevisRequest, trackProductClick } from '../firebase';
+import { getProducts, addDevisRequest, trackProductClick } from '../supabase';
 
 interface CatalogueProps {
   initialCategoryFilter?: string | null;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Phone, Mail, MapPin, Clock, Calendar, Compass, HelpCircle, Check, Star } from 'lucide-react';
-import { addDevisRequest } from '../firebase';
+import { addDevisRequest } from '../supabase';
 
 interface ContactProps {
   onSuccessMessage: (msg: string) => void;

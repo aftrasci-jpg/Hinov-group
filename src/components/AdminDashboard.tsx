@@ -12,8 +12,8 @@ import {
   getBlogArticles, addBlogArticle, updateBlogArticle, deleteBlogArticle,
   getDevisRequests, updateDevisRequestStatus, deleteDevisRequest,
   getStats
-} from '../firebase';
-import { getCloudinaryConfig, uploadToCloudinary } from '../utils/cloudinary';
+} from '../supabase';
+import { getStorageConfig, uploadToStorage } from '../utils/supabase-storage';
 import { motion } from 'motion/react';
 
 interface AdminDashboardProps {
@@ -64,16 +64,16 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
     }
     setIsUploading(true);
     try {
-      const { isConfigured } = getCloudinaryConfig();
+      const { isConfigured } = getStorageConfig();
       if (isConfigured) {
-        onNotify("📤 Téléversement de l'image vers Cloudinary...");
-        const cloudinaryUrl = await uploadToCloudinary(file);
-        setProductForm(prev => ({ ...prev, imageUrl: cloudinaryUrl }));
-        onNotify("✓ Image de produit téléversée sur Cloudinary !");
+        onNotify("📤 Téléversement de l'image vers Supabase Storage...");
+        const url = await uploadToStorage(file);
+        setProductForm(prev => ({ ...prev, imageUrl: url }));
+        onNotify("✓ Image de produit téléversée sur Supabase Storage !");
       } else {
         const base64 = await compressAndGetBase64(file);
         setProductForm(prev => ({ ...prev, imageUrl: base64 }));
-        onNotify("✓ Image enregistrée en local (Base64). Configurez Cloudinary pour le stockage cloud permanent.");
+        onNotify("✓ Image enregistrée en local (Base64). Configurez Supabase pour le stockage cloud permanent.");
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erreur de téléversement";
@@ -91,16 +91,16 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
     }
     setIsUploading(true);
     try {
-      const { isConfigured } = getCloudinaryConfig();
+      const { isConfigured } = getStorageConfig();
       if (isConfigured) {
-        onNotify("📤 Téléversement de l'image vers Cloudinary...");
-        const cloudinaryUrl = await uploadToCloudinary(file);
-        setGalleryForm(prev => ({ ...prev, imageUrl: cloudinaryUrl }));
-        onNotify("✓ Image de réalisation téléversée sur Cloudinary !");
+        onNotify("📤 Téléversement de l'image vers Supabase Storage...");
+        const url = await uploadToStorage(file);
+        setGalleryForm(prev => ({ ...prev, imageUrl: url }));
+        onNotify("✓ Image de réalisation téléversée sur Supabase Storage !");
       } else {
         const base64 = await compressAndGetBase64(file);
         setGalleryForm(prev => ({ ...prev, imageUrl: base64 }));
-        onNotify("✓ Image enregistrée en local (Base64). Configurez Cloudinary pour le stockage cloud permanent.");
+        onNotify("✓ Image enregistrée en local (Base64). Configurez Supabase pour le stockage cloud permanent.");
       }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Erreur de téléversement";
@@ -452,15 +452,15 @@ export default function AdminDashboard({ onNotify, setCurrentTab }: AdminDashboa
             <span className="text-xs text-gray-400 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1">
               ⚡ Statut : <strong className="text-emerald-400">Dual-Suite (LocalStorage permanent)</strong>
             </span>
-            {getCloudinaryConfig().isConfigured ? (
+            {getStorageConfig().isConfigured ? (
               <span className="text-xs text-gray-400 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center space-x-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Cloudinary : <strong className="text-emerald-400 font-bold">Actif</strong></span>
+                <span>Supabase Storage : <strong className="text-emerald-400 font-bold">Actif</strong></span>
               </span>
             ) : (
-              <span className="text-xs text-gray-400 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center space-x-1.5" title="Configurez VITE_CLOUDINARY_CLOUD_NAME et VITE_CLOUDINARY_UPLOAD_PRESET dans vos secrets.">
+              <span className="text-xs text-gray-400 bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1 flex items-center space-x-1.5" title="Configurez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans vos secrets.">
                 <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                <span>Cloudinary : <strong className="text-[#F29A1A] font-bold">Local (Base64)</strong></span>
+                <span>Supabase Storage : <strong className="text-[#F29A1A] font-bold">Local (Base64)</strong></span>
               </span>
             )}
             <button 

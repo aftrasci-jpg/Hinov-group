@@ -11,7 +11,7 @@ import {
   getBlogArticles, addBlogArticle, updateBlogArticle, deleteBlogArticle,
   getDevisRequests, updateDevisRequestStatus, deleteDevisRequest,
   getStats, getSessionUser, signUpOrInMock, logoutSessionUser
-} from '../firebase';
+} from '../supabase';
 
 interface AdminPanelProps {
   onSuccessMessage: (msg: string) => void;

@@ -11,7 +11,7 @@ import AdminDashboard from './components/AdminDashboard';
 
 // DB getters & types
 import { Product, RealisationItem } from './types';
-import { getProducts, getRealisations, trackProductClick } from './firebase';
+import { getProducts, getRealisations, trackProductClick } from './supabase';
 
 import { 
   Network, Printer, Shirt, BookOpen, ChevronRight, 
@@ -104,11 +104,19 @@ export default function App() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                 
                 {/* Pillar 1: Informatique */}
-                <div className="group bg-white rounded-3xl p-6.5 border border-slate-100 hover:border-[#4A93D1] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-[340px]">
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#4A93D1]/10 flex items-center justify-center text-[#4A93D1] group-hover:bg-[#4A93D1] group-hover:text-white transition-all duration-350">
-                      <Network className="w-6 h-6" />
+                <div className="group bg-white rounded-3xl border border-slate-100 hover:border-[#4A93D1] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+                  <div className="relative h-44 overflow-hidden bg-slate-100">
+                    <img
+                      src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=600"
+                      alt="Solutions réseaux & Informatique"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#4A93D1]/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white/90 flex items-center justify-center text-[#4A93D1] shadow">
+                      <Network className="w-5 h-5" />
                     </div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-grow justify-between space-y-3">
                     <div className="space-y-1.5">
                       <h3 className="font-extrabold text-slate-900 text-base leading-tight group-hover:text-[#4A93D1] transition-colors">
                         Solutions réseaux & Informatique
@@ -117,22 +125,30 @@ export default function App() {
                         Câblage de bureaux, pare-feu de protection, caméra de sécurité IP intelligente et vente d'ordinateurs ou serveurs Dell/HP.
                       </p>
                     </div>
+                    <button 
+                      onClick={() => setCurrentTab('catalogue-Matériel Informatique')}
+                      className="cursor-pointer text-xs font-extrabold text-[#4A93D1] inline-flex items-center space-x-1 hover:space-x-2 transition-all w-max"
+                    >
+                      <span>Découvrir le matériel</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => setCurrentTab('catalogue-Matériel Informatique')}
-                    className="cursor-pointer text-xs font-extrabold text-[#4A93D1] inline-flex items-center space-x-1 hover:space-x-2 transition-all mt-4 w-max"
-                  >
-                    <span>Découvrir le matériel</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
 
                 {/* Pillar 2: Imprimerie offset/numerique */}
-                <div className="group bg-white rounded-3xl p-6.5 border border-slate-100 hover:border-[#F29A1A] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-[340px]">
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F29A1A]/10 flex items-center justify-center text-[#F29A1A] group-hover:bg-[#F29A1A] group-hover:text-white transition-all duration-350">
-                      <Printer className="w-6 h-6" />
+                <div className="group bg-white rounded-3xl border border-slate-100 hover:border-[#F29A1A] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+                  <div className="relative h-44 overflow-hidden bg-slate-100">
+                    <img
+                      src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&q=80&w=600"
+                      alt="Imprimerie & Supports de communication"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#F29A1A]/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white/90 flex items-center justify-center text-[#F29A1A] shadow">
+                      <Printer className="w-5 h-5" />
                     </div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-grow justify-between space-y-3">
                     <div className="space-y-1.5">
                       <h3 className="font-extrabold text-slate-900 text-base leading-tight group-hover:text-[#F29A1A] transition-colors">
                         Imprimerie & Supports de com
@@ -141,22 +157,30 @@ export default function App() {
                         Bâches géantes promotionnelles, vinyles autocollants de vitrine, kakemonos légers et impression offset de revues de luxe.
                       </p>
                     </div>
+                    <button 
+                      onClick={() => setCurrentTab('catalogue-Supports de Communication')}
+                      className="cursor-pointer text-xs font-extrabold text-[#F29A1A] inline-flex items-center space-x-1 hover:space-x-2 transition-all w-max"
+                    >
+                      <span>Voir nos impressions</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => setCurrentTab('catalogue-Supports de Communication')}
-                    className="cursor-pointer text-xs font-extrabold text-[#F29A1A] inline-flex items-center space-x-1 hover:space-x-2 transition-all mt-4 w-max"
-                  >
-                    <span>Voir nos impressions</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
 
                 {/* Pillar 3: Textiles et objets */}
-                <div className="group bg-white rounded-3xl p-6.5 border border-slate-100 hover:border-[#C83AB3] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-[340px]">
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#C83AB3]/10 flex items-center justify-center text-[#C83AB3] group-hover:bg-[#C83AB3] group-hover:text-white transition-all duration-350">
-                      <Shirt className="w-6 h-6" />
+                <div className="group bg-white rounded-3xl border border-slate-100 hover:border-[#C83AB3] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+                  <div className="relative h-44 overflow-hidden bg-slate-100">
+                    <img
+                      src="https://images.unsplash.com/photo-1489987707025-afc232f7ea0f?auto=format&fit=crop&q=80&w=600"
+                      alt="Objets & Textiles personnalisés"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#C83AB3]/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white/90 flex items-center justify-center text-[#C83AB3] shadow">
+                      <Shirt className="w-5 h-5" />
                     </div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-grow justify-between space-y-3">
                     <div className="space-y-1.5">
                       <h3 className="font-extrabold text-slate-900 text-base leading-tight group-hover:text-[#C83AB3] transition-colors">
                         Objets & Textiles personnalisés
@@ -165,22 +189,30 @@ export default function App() {
                         Polos brodés de haute qualité, T-shirts sérigraphiés, impression mug de bureau, stylos personnalisés, gourdes et goodies.
                       </p>
                     </div>
+                    <button 
+                      onClick={() => setCurrentTab('catalogue-Textile Personnalisé')}
+                      className="cursor-pointer text-xs font-extrabold text-[#C83AB3] inline-flex items-center space-x-1 hover:space-x-2 transition-all w-max"
+                    >
+                      <span>Catalogue textile</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => setCurrentTab('catalogue-Textile Personnalisé')}
-                    className="cursor-pointer text-xs font-extrabold text-[#C83AB3] inline-flex items-center space-x-1 hover:space-x-2 transition-all mt-4 w-max"
-                  >
-                    <span>Catalogue textile</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
 
                 {/* Pillar 4: Scolaires et bureau */}
-                <div className="group bg-white rounded-3xl p-6.5 border border-slate-100 hover:border-[#4CD37E] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between h-[340px]">
-                  <div className="space-y-4">
-                    <div className="w-12 h-12 rounded-2xl bg-[#4CD37E]/10 flex items-center justify-center text-[#4CD37E] group-hover:bg-[#4CD37E] group-hover:text-white transition-all duration-350">
-                      <BookOpen className="w-6 h-6" />
+                <div className="group bg-white rounded-3xl border border-slate-100 hover:border-[#4CD37E] shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+                  <div className="relative h-44 overflow-hidden bg-slate-100">
+                    <img
+                      src="https://images.unsplash.com/photo-1456735190827-d1262f71b8a3?auto=format&fit=crop&q=80&w=600"
+                      alt="Fournitures en gros scolaire/bureau"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#4CD37E]/60 to-transparent" />
+                    <div className="absolute bottom-3 left-3 w-9 h-9 rounded-xl bg-white/90 flex items-center justify-center text-[#4CD37E] shadow">
+                      <BookOpen className="w-5 h-5" />
                     </div>
+                  </div>
+                  <div className="p-5 flex flex-col flex-grow justify-between space-y-3">
                     <div className="space-y-1.5">
                       <h3 className="font-extrabold text-slate-900 text-base leading-tight group-hover:text-[#4CD37E] transition-colors">
                         Fournitures en gros scolaire/bureau
@@ -189,14 +221,14 @@ export default function App() {
                         Distribution de ramettes de papier format A4, cahiers scolaires de marque, stylos complémentaires et consommables imprimantes.
                       </p>
                     </div>
+                    <button 
+                      onClick={() => setCurrentTab('catalogue-Fournitures Scolaires')}
+                      className="cursor-pointer text-xs font-extrabold text-[#4CD37E] inline-flex items-center space-x-1 hover:space-x-2 transition-all w-max"
+                    >
+                      <span>Explorer l'offre</span>
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
                   </div>
-                  <button 
-                    onClick={() => setCurrentTab('catalogue-Fournitures Scolaires')}
-                    className="cursor-pointer text-xs font-extrabold text-[#4CD37E] inline-flex items-center space-x-1 hover:space-x-2 transition-all mt-4 w-max"
-                  >
-                    <span>Explorer l'offre</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
 
               </div>

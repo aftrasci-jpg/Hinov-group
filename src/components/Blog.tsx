@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, User, ArrowRight, BookOpen, X, Clock, HelpCircle } from 'lucide-react';
 import { BlogArticle } from '../types';
-import { getBlogArticles } from '../firebase';
+import { getBlogArticles } from '../supabase';
 
 const BLOG_CATEGORIES = [
   "Tous",
