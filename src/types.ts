@@ -44,3 +44,28 @@ export interface SiteStats {
   requestsCount: number;
   popularProducts: { name: string; category: string; clicks: number }[];
 }
+
+export interface HeroSlideContent {
+  title: string;
+  description: string;
+  ctaText: string;
+}
+
+export interface SiteContent {
+  hero: {
+    slides: HeroSlideContent[];
+  };
+  contact: {
+    address: string;
+    phone1: string;
+    phone2: string;
+    email: string;
+    whatsapp: string;
+  };
+  about: {
+    tagline: string;
+    intro: string;
+    mission: string;
+    vision: string;
+  };
+}
